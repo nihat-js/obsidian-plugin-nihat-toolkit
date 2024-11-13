@@ -1,4 +1,5 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import SaveSnippetModal from './modals/SaveSnippetModal';
 
 // Remember to rename these classes and interfaces!
 
@@ -15,6 +16,15 @@ export default class MyPlugin extends Plugin {
 
 	async onload() {
 		await this.loadSettings();
+    
+
+    this.addCommand({
+      id: 'save-snippet',
+      name: 'Save Snippet',
+      callback: () => {
+          new SaveSnippetModal(this.app).open();
+      },
+  });
 
 		// This creates an icon in the left ribbon.
 		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
