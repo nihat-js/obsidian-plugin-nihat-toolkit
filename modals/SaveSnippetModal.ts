@@ -1,8 +1,8 @@
 import { App, Modal, Notice, TFile } from "obsidian";
 
 export default class SaveSnippetModal extends Modal {
-    private content = '';
 
+    private textArea : HTMLTextAreaElement;
     constructor(app: App) {
         super(app);
     }
@@ -12,21 +12,20 @@ export default class SaveSnippetModal extends Modal {
         contentEl.createEl('h2', { text: 'Save Snippet' });
 
         // Create a text area for user input
-        const textarea = contentEl.createEl('textarea');
-        textarea.placeholder = 'Paste your snippet here...';
-        textarea.style.width = '100%';
-        textarea.style.height = '200px';
+        this.textArea = contentEl.createEl('textarea');
+        this.textArea.placeholder = 'Paste your snippet here...';
+        this.textArea.style.width = '100%';
+        this.textArea.style.height = '200px';
 
         // Automatically paste the content from the clipboard
         navigator.clipboard.readText().then(text => {
-            textarea.value = text;
-            this.content = text;  // Store content in variable
+            this.textArea.value = text;
         });
 
         // Save Button
         const saveButton = contentEl.createEl('button', { text: 'Save Snippet' });
         saveButton.addEventListener('click', async () => {
-            if (this.content.trim()) {
+            if (this.textArea.value.trim()) {
                 await this.saveSnippet();
                 this.close();
             } else {
@@ -34,8 +33,9 @@ export default class SaveSnippetModal extends Modal {
             }
         });
 
-        // Focus the Save Snippet button after the modal opens
-        saveButton.focus();
+        setTimeout(() => {
+            saveButton.focus();
+        }, 100); 
     }
 
     // Function to append snippet to file
@@ -64,7 +64,7 @@ export default class SaveSnippetModal extends Modal {
         }
 
         // Append content to the file
-        await this.app.vault.append(fileToAppend, `\n---\n\`\`\` ${this.content}  \n\`\`\``);
+        await this.app.vault.append(fileToAppend, `\n\n\`\`\`\n${this.textArea.value.trim()}\n\`\`\``);
 
         // Notify user and close modal
         new Notice('Snippet saved!');
